@@ -16,17 +16,29 @@ const wmoText = (code?: number) => {
 }
 
 const handleRefresh = () => refresh()
+
+const liClass = 'flex items-center py-0.5 text-sm '
+const iconClass = 'shrink-0 h-4 w-4 me-2 text-neutral-900 dark:text-neutral-100'
+const textClass = 'truncate text-neutral-900 dark:text-neutral-100'
+
+const items = computed(() => {
+  const temp = Math.round(current.value?.temperature ?? 0) + '°'
+  const status = wmoText(current.value?.weathercode)
+  const wind = '풍속 ' + Math.round(current.value?.windspeed ?? 0) + ' m/s'
+  const date = `${current.value?.date ?? ''} ${current.value?.time ?? ''}`.trim()
+
+  return [
+    { key: 'temp', icon: 'i-lucide-thermometer', text: temp },
+    { key: 'status', icon: 'i-lucide-cloud-sun', text: status },
+    { key: 'wind', icon: 'i-lucide-wind', text: wind },
+    { key: 'date', icon: 'i-lucide-calendar-clock', text: date }
+  ]
+})
 </script>
 
 <template>
-  <div
-    class="absolute h-(--indicator-size) translate-y-(--indicator-position) w-px bg-primary"
-    style="--indicator-size: 32px; --indicator-position: 0px;"
-    aria-hidden="true"
-  />
-
-  <div class="min-w-0 ps-4 border-s border-default w-full">
-    <div class="flex items-center justify-between py-1">
+  <div class="w-full max-w-[192px] min-w-0 min-h-[164px] shrink-0 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+    <div class="flex items-center justify-between pb-1">
       <h3 class="font-semibold">현재 날씨</h3>
 
       <UButton
@@ -41,45 +53,20 @@ const handleRefresh = () => refresh()
       />
     </div>
 
-    <div class="py-1">
-      <div v-if="pending" class="text-sm text-neutral-500">
-        불러오는 중…
-      </div>
-
-      <div v-else-if="error" class="text-sm text-amber-600 dark:text-amber-400 flex items-center gap-2">
-        <UIcon name="i-lucide-alert-triangle" class="h-4 w-4" aria-hidden="true" />
-        데이터를 불러오지 못했습니다
-      </div>
-
-      <ul v-else class="space-y-0.5">
-        <li class="text-sm flex items-center py-0.5">
-          <UIcon name="i-lucide-thermometer" class="h-4 w-4 me-2 text-neutral-900 dark:text-neutral-100" aria-hidden="true" />
-          <span class="truncate text-neutral-900 dark:text-neutral-100">
-            {{ Math.round(current.temperature ?? 0) }}°
-          </span>
-        </li>
-
-        <li class="text-sm flex items-center py-0.5">
-          <UIcon name="i-lucide-cloud-sun" class="h-4 w-4 me-2 text-neutral-900 dark:text-neutral-100" aria-hidden="true" />
-          <span class="truncate text-neutral-900 dark:text-neutral-100">
-            {{ wmoText(current.weathercode) }}
-          </span>
-        </li>
-
-        <li class="text-sm flex items-center py-0.5">
-          <UIcon name="i-lucide-wind" class="h-4 w-4 me-2 text-neutral-900 dark:text-neutral-100" aria-hidden="true" />
-          <span class="truncate text-neutral-900 dark:text-neutral-100">
-            풍속 {{ Math.round(current.windspeed ?? 0) }} m/s
-          </span>
-        </li>
-
-        <li class="text-sm flex items-center py-0.5">
-          <UIcon name="i-lucide-calendar-clock" class="h-4 w-4 me-2 text-neutral-900 dark:text-neutral-100" aria-hidden="true" />
-          <span class="truncate text-neutral-900 dark:text-neutral-100">
-            {{ current.date }} {{ current.time }}
-          </span>
-        </li>
-      </ul>
+    <div v-if="pending" class="text-sm text-neutral-500">
+      불러오는 중…
     </div>
+
+    <div v-else-if="error" class="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
+      <UIcon name="i-lucide-alert-triangle" class="h-4 w-4 shrink-0" aria-hidden="true" />
+      데이터를 불러오지 못했습니다.
+    </div>
+
+    <ul v-else class="space-y-0.5">
+      <li v-for="item in items" :key="item.key" :class="liClass">
+        <UIcon :name="item.icon" :class="iconClass" aria-hidden="true" />
+        <span :class="textClass">{{ item.text }}</span>
+      </li>
+    </ul>
   </div>
 </template>
