@@ -37,7 +37,7 @@ const items = computed(() => {
 </script>
 
 <template>
-  <div class="w-full max-w-[192px] min-w-0 min-h-[164px] shrink-0 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+  <div class="w-full max-w-[192px] min-w-0 h-[164px] shrink-0 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800">
     <div class="flex items-center justify-between pb-1">
       <h3 class="font-semibold">현재 날씨</h3>
 
