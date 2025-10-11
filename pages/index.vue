@@ -1,6 +1,6 @@
 <template>
   <div class="flex gap-4">
-    <div class="flex-1 min-w-0 dark:border-neutral-800">
+    <div class="flex-1 min-w-0">
       <h2 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Welcome Home</h2>
     </div>
 
