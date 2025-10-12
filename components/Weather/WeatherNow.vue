@@ -1,3 +1,38 @@
+<template>
+  <div class="w-full max-w-[192px] min-w-0 h-[164px] shrink-0 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+    <div class="flex items-center justify-between pb-1">
+      <h3 class="font-semibold">현재 날씨</h3>
+
+      <UButton
+        :icon="pending ? 'i-lucide-loader-circle' : 'i-lucide-refresh-ccw'"
+        :loading="pending"
+        size="xs"
+        variant="ghost"
+        color="neutral"
+        :aria-busy="pending ? 'true' : 'false'"
+        aria-label="새로고침"
+        @click="handleRefresh"
+      />
+    </div>
+
+    <div v-if="pending" class="text-sm text-neutral-500">
+      불러오는 중…
+    </div>
+
+    <div v-else-if="error" class="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
+      <UIcon name="i-lucide-alert-triangle" class="h-4 w-4 shrink-0" aria-hidden="true" />
+      데이터를 불러오지 못했습니다.
+    </div>
+
+    <ul v-else class="space-y-0.5">
+      <li v-for="item in items" :key="item.key" :class="liClass">
+        <UIcon :name="item.icon" :class="iconClass" aria-hidden="true" />
+        <span :class="textClass">{{ item.text }}</span>
+      </li>
+    </ul>
+  </div>
+</template>
+
 <script setup lang="ts">
 const props = defineProps<{ lat?: number; lon?: number; title?: string }>()
 const { current, pending, error, refresh } = useWeather(props.lat, props.lon)
@@ -51,40 +86,4 @@ const items = computed(() => {
     { key: 'date', icon: 'i-lucide-calendar-clock', text: date }
   ]
 })
-
 </script>
-
-<template>
-  <div class="w-full max-w-[192px] min-w-0 h-[164px] shrink-0 p-4 rounded-2xl border border-neutral-200 dark:border-neutral-800">
-    <div class="flex items-center justify-between pb-1">
-      <h3 class="font-semibold">현재 날씨</h3>
-
-      <UButton
-        :icon="pending ? 'i-lucide-loader-circle' : 'i-lucide-refresh-ccw'"
-        :loading="pending"
-        size="xs"
-        variant="ghost"
-        color="neutral"
-        :aria-busy="pending ? 'true' : 'false'"
-        aria-label="새로고침"
-        @click="handleRefresh"
-      />
-    </div>
-
-    <div v-if="pending" class="text-sm text-neutral-500">
-      불러오는 중…
-    </div>
-
-    <div v-else-if="error" class="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400">
-      <UIcon name="i-lucide-alert-triangle" class="h-4 w-4 shrink-0" aria-hidden="true" />
-      데이터를 불러오지 못했습니다.
-    </div>
-
-    <ul v-else class="space-y-0.5">
-      <li v-for="item in items" :key="item.key" :class="liClass">
-        <UIcon :name="item.icon" :class="iconClass" aria-hidden="true" />
-        <span :class="textClass">{{ item.text }}</span>
-      </li>
-    </ul>
-  </div>
-</template>
