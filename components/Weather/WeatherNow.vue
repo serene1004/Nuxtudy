@@ -2,18 +2,35 @@
 const props = defineProps<{ lat?: number; lon?: number; title?: string }>()
 const { current, pending, error, refresh } = useWeather(props.lat, props.lon)
 
-const wmoText = (code?: number) => {
-  if (code == null) return '정보 없음'
-  if (code === 0) return '맑음'
-  if ([1,2,3].includes(code)) return '구름 조금'
-  if ([45,48].includes(code)) return '안개'
-  if ([51,53,55,56,57].includes(code)) return '이슬비'
-  if ([61,63,65,66,67].includes(code)) return '비'
-  if ([71,73,75,77].includes(code)) return '눈'
-  if ([80,81,82].includes(code)) return '소나기'
-  if ([95,96,99].includes(code)) return '뇌우'
-  return `코드 ${code}`
+type WmoInfo = { text: string; icon: string }
+const wmoInfo = (code?: number, isDay?: number | boolean): WmoInfo => {
+  const day = typeof isDay === 'boolean' ? isDay : isDay === 1
+
+  if (code == null) return { text: '정보 없음', icon: 'i-lucide-cloud' }
+  if (code === 0) {
+    return { text: '맑음', icon: day ? 'i-lucide-sun' : 'i-lucide-moon' }
+  }
+  if ([1, 2, 3].includes(code)) {
+    return { text: '구름 조금', icon: day ? 'i-lucide-cloud-sun' : 'i-lucide-cloud-moon' }
+  }
+  if ([45, 48].includes(code)) {
+    return { text: '안개', icon: 'i-lucide-fog' }
+  }
+  if ([51, 53, 55, 56, 57].includes(code)) {
+    return { text: '이슬비', icon: 'i-lucide-cloud-drizzle' }
+  }
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) {
+    return { text: '비', icon: 'i-lucide-cloud-rain' }
+  }
+  if ([71, 73, 75, 77, 85, 86].includes(code)) {
+    return { text: '눈', icon: 'i-lucide-cloud-snow' }
+  }
+  if ([95, 96, 99].includes(code)) {
+    return { text: '뇌우', icon: 'i-lucide-cloud-lightning' }
+  }
+  return { text: `코드 ${code}`, icon: 'i-lucide-cloud' }
 }
+const status = computed(() => wmoInfo(current.value?.weathercode, (current as any).value?.is_day))
 
 const handleRefresh = () => refresh()
 
@@ -23,17 +40,18 @@ const textClass = 'truncate text-neutral-900 dark:text-neutral-100'
 
 const items = computed(() => {
   const temp = Math.round(current.value?.temperature ?? 0) + '°'
-  const status = wmoText(current.value?.weathercode)
+  const s = status.value
   const wind = '풍속 ' + Math.round(current.value?.windspeed ?? 0) + ' m/s'
   const date = `${current.value?.date ?? ''} ${current.value?.time ?? ''}`.trim()
 
   return [
     { key: 'temp', icon: 'i-lucide-thermometer', text: temp },
-    { key: 'status', icon: 'i-lucide-cloud-sun', text: status },
+    { key: 'status', icon: s.icon, text: s.text },
     { key: 'wind', icon: 'i-lucide-wind', text: wind },
     { key: 'date', icon: 'i-lucide-calendar-clock', text: date }
   ]
 })
+
 </script>
 
 <template>
